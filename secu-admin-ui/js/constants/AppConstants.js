@@ -1,0 +1,82 @@
+/*
+ * AppConstants
+ * These are the variables that determine what our central data store (reducer.js)
+ * changes in our state. When you add a new action, you have to add a new constant here
+ *
+ * Follow this format:
+ * export const YOUR_ACTION_CONSTANT = 'YOUR_ACTION_CONSTANT';
+ */
+
+
+export const CHANGE_PROJECT_NAME = 'CHANGE_PROJECT_NAME';
+export const CHANGE_OWNER_NAME = 'CHANGE_OWNER_NAME';
+
+export const ROLES_LOAD_REQUEST = 'ROLES_LOAD_REQUEST';
+export const ROLES_LOAD_SUCCESS = 'ROLES_LOAD_SUCCESS';
+export const ROLES_LOAD_ERROR = 'ROLES_LOAD_ERROR';
+
+export const PERMISSIONS_LOAD_REQUEST = 'PERMISSIONS_LOAD_REQUEST';
+export const PERMISSIONS_LOAD_SUCCESS = 'PERMISSIONS_LOAD_SUCCESS';
+export const PERMISSIONS_LOAD_ERROR = 'PERMISSIONS_LOAD_ERROR';
+
+export const RESOURCES_LOAD_REQUEST = 'RESOURCES_LOAD_REQUEST';
+export const RESOURCES_LOAD_SUCCESS = 'RESOURCES_LOAD_SUCCESS';
+export const RESOURCES_LOAD_ERROR = 'RESOURCES_LOAD_ERROR';
+
+export const USERS_LOAD_REQUEST = 'USERS_LOAD_REQUEST';
+export const USERS_LOAD_SUCCESS = 'USERS_LOAD_SUCCESS';
+export const USERS_LOAD_ERROR = 'USERS_LOAD_ERROR';
+
+export const USER_LOAD_REQUEST = 'USER_LOAD_REQUEST';
+export const USER_LOAD_SUCCESS = 'USER_LOAD_SUCCESS';
+export const USER_CREATE_REQUEST = "USER_CREATE_REQUEST";
+export const USER_ERROR = 'USER_ERROR';
+export const USER_CLEAR_ERROR = 'USER_CLEAR_ERROR';
+
+export const PROFILES_LOAD_REQUEST = 'PROFILES_LOAD_REQUEST';
+export const PROFILES_LOAD_SUCCESS = 'PROFILES_LOAD_SUCCESS';
+export const PROFILES_LOAD_ERROR = 'PROFILES_LOAD_ERROR';
+
+export const PROFILE_LOAD_REQUEST = 'PROFILE_LOAD_REQUEST';
+export const PROFILE_LOAD_SUCCESS = 'PROFILE_LOAD_SUCCESS';
+export const PROFILE_UPDATE_DESC_REQUEST = 'PROFILE_UPDATE_DESC_REQUEST';
+export const PROFILE_UPDATE_USERS_REQUEST = 'PROFILE_UPDATE_USERS_REQUEST';
+export const PROFILE_UPDATE_ROLES_REQUEST = 'PROFILE_UPDATE_ROLES_REQUEST';
+export const PROFILE_CREATE_REQUEST = 'PROFILE_CREATE_REQUEST';
+export const PROFILE_ERROR = 'PROFILE_LOAD_ERROR';
+export const PROFILE_CLEAR_ERROR = 'PROFILE_CLEAR_ERROR';
+
+export const POLICIES_LOAD_REQUEST = 'POLICIES_LOAD_REQUEST';
+export const POLICIES_LOAD_SUCCESS = 'POLICIES_LOAD_SUCCESS';
+export const POLICIES_LOAD_ERROR = 'POLICIES_LOAD_ERROR';
+
+export const POLICY_LOAD_REQUEST = 'POLICY_LOAD_REQUEST';
+export const POLICY_LOAD_SUCCESS = 'POLICY_LOAD_SUCCESS';
+export const POLICY_UPDATE_DESC_REQUEST = 'POLICY_UPDATE_DESC_REQUEST';
+export const POLICY_UPDATE_RES_REQUEST = 'POLICY_UPDATE_RES_REQUEST';
+export const POLICY_UPDATE_USERS_REQUEST = 'POLICY_UPDATE_USERS_REQUEST';
+export const POLICY_UPDATE_ROLES_REQUEST = 'POLICY_UPDATE_ROLES_REQUEST';
+export const POLICY_CREATE_REQUEST = 'POLICY_CREATE_REQUEST';
+export const POLICY_ERROR = 'POLICY_LOAD_ERROR';
+export const POLICY_CLEAR_ERROR = 'POLICY_CLEAR_ERROR';
+
+
+import {API_BASE_URL} from '../config/ApiConfig';
+
+export const API_LOGIN_URL = API_BASE_URL + '/login';
+export const API_ROLES_URL = API_BASE_URL + '/roles';
+export const API_RESOURCES_URL = API_BASE_URL + '/resources';
+export const API_USERS_URL = API_BASE_URL + '/users';
+export const API_USER_URL = API_BASE_URL + '/users/{0}';
+export const API_USER_NAME_URL = API_BASE_URL + '/users/{0}/name';
+export const API_PROFILES_URL = API_BASE_URL + '/profiles';
+export const API_PROFILE_URL = API_BASE_URL + '/profiles/{0}';
+export const API_PROFILE_DESC_URL = API_BASE_URL + '/profiles/{0}/description';
+export const API_PROFILE_USERS_URL = API_BASE_URL + '/profiles/{0}/users';
+export const API_PROFILE_ROLES_URL = API_BASE_URL + '/profiles/{0}/roles';
+
+export const API_POLICIES_URL = API_BASE_URL + '/policies';
+export const API_POLICY_URL = API_BASE_URL + '/policies/{0}';
+export const API_POLICY_DESC_URL = API_BASE_URL + '/policies/{0}/description';
+export const API_POLICY_USERS_URL = API_BASE_URL + '/policies/{0}/users';
+export const API_POLICY_PERMISSIONS_URL = API_BASE_URL + '/policies/{0}/permissions';
