@@ -19,11 +19,6 @@ dependencies:
     - cd $PROJECT_PATH && make
 
 test:
-  pre:
-    - docker pull nats
-    - docker pull eogile/agilestack-root-app && docker tag eogile/agilestack-root-app agilestack-root-app
-    - docker images
-
   override:
     - cd $PROJECT_PATH && make test
 
