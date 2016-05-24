@@ -52,7 +52,7 @@ injectTapEventPlugin();
 
 // Import the pages
 import HomePage from './components/pages/HomePage.react';
-import { LoginPage } from 'agilestack-login-ui/lib';
+import { LoginPage } from 'agilestack-login-ui';
 import ProfilesPage from './components/pages/ProfilesPage.react';
 import UsersPage from './components/pages/UsersPage.react';
 import RolesPage from './components/pages/RolesPage.react';

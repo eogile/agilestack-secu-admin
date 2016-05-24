@@ -6,66 +6,56 @@
  * contain code that should be seen on all pages. (e.g. navigation bar)
  */
 
-import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import Logo from '../../img/AgileStack_transparent_logo.png';
-import {
-        Avatar,
-        DropDownMenu,
-        FlatButton,
-        FontIcon,
-        IconMenu,
-        IconButton,
-        List,
-        ListItem,
-        MenuItem,
-        NavigationExpandMoreIcon,
-        Toolbar,
-        ToolbarGroup,
-        ToolbarSeparator,
-        ToolbarTitle,
-      } from 'material-ui';
-import { Link } from 'react-router';
-import { push } from 'react-router-redux';
-import { loginSuccess } from 'agilestack-login-ui/lib';
+import React, {Component} from "react";
+import {connect} from "react-redux";
+import Logo from "../../img/AgileStack_transparent_logo.png";
+import {Avatar, FlatButton, NavigationExpandMoreIcon, Toolbar, ToolbarGroup} from "material-ui";
+import {push} from "react-router-redux";
+import {logout} from 'agilestack-login-ui';
+
+function initials(currentUser) {
+  let initials = '';
+  if (!currentUser) {
+    return initials;
+  }
+  if (currentUser.firstName) {
+    initials += currentUser.firstName.charAt(0);
+  }
+  if (currentUser.lastName) {
+    initials += currentUser.lastName.charAt(0);
+  }
+  if (initials == '' && currentUser.login) {
+    initials = currentUser.login.substr(0, 2);
+  }
+  initials = initials.toUpperCase();
+  console.log('initials', currentUser, initials);
+  return initials;
+}
 
 class App extends Component {
 
-  handleLogin() {
+  constructor(props) {
+    super(props);
+    this.onLogin = this.onLogin.bind(this);
+    this.onLogout = this.onLogout.bind(this);
+  }
+
+  onLogin() {
     console.log("this.props in handleLogin : ", this.props);
-    const { dispatch} = this.props;
-    const { routing } = this.props.data;
+    const {dispatch, routing} = this.props;
 
     console.log(routing.locationBeforeTransitions);
     dispatch(push('/login?callback='+encodeURI(routing.locationBeforeTransitions.pathname)));
   }
 
-  componentWillMount () {
-    const { dispatch} = this.props;
-    //check if authentified to change state
-    var tokenInfoString = localStorage.getItem('tokenInfo');
-    if (tokenInfoString) {
-      dispatch(loginSuccess(JSON.parse(tokenInfoString)));
-    }
-
-
+  onLogout() {
+    console.log('logout');
+    const {dispatch} = this.props;
+    dispatch(logout());
   }
 
   render() {
-    console.log("this.props.data", this.props.data);
-    const {login } = this.props.data;
-    console.log(login.loggedin);
-    var rightToolbarElement;
-    if (login.loggedin) {
-      rightToolbarElement = <Avatar style={{
-                                            marginTop: '10'
-                                          }}>
-                              JL
-                            </Avatar>;
-    } else {
-      rightToolbarElement =
-          <FlatButton label="Sign in" primary={true} onTouchTap={this.handleLogin.bind(this)}/>;
-    }
+    const {currentUser} = this.props;
     return (
       <div className="wrapper">
         <Toolbar>
@@ -73,7 +63,13 @@ class App extends Component {
             <img className="logo" src={Logo} />
           </ToolbarGroup>
           <ToolbarGroup float="right">
-            {rightToolbarElement}
+            {currentUser.loggedIn ? (
+              <Avatar style={{marginTop: '10'}} onTouchTap={this.onLogout}>
+                {initials(currentUser.user)}
+              </Avatar>
+            ) : (
+              <FlatButton label="Sign in" primary={true} onTouchTap={this.onLogin}/>
+            )}
           </ToolbarGroup>
         </Toolbar>
         {this.props.children}
@@ -82,14 +78,8 @@ class App extends Component {
   }
 }
 
-// REDUX STUFF
-
-// Which props do we want to inject, given the global state?
-function select(state) {
-  return {
-    data: state
-  };
-}
-
-// Wrap the component to inject dispatch and state into it
-export default connect(select)(App);
+// REDUX Wrap the component to inject dispatch and state into it
+export default connect(state => ({
+  routing: state.routing,
+  currentUser: state.currentUser
+}))(App);

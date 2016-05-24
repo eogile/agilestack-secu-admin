@@ -14,7 +14,7 @@ import profilesReducer from './profilesReducer';
 import profileReducer from './profileReducer';
 import policiesReducer from './policiesReducer';
 import policyReducer from './policyReducer';
-import loginReducer from 'agilestack-login-ui/lib/reducers/loginReducer';
+import {loginReducer, currentUserReducer} from 'agilestack-login-ui';
 import {routerReducer} from 'react-router-redux'
 
 const rootReducer = combineReducers({
@@ -28,6 +28,7 @@ const rootReducer = combineReducers({
     policies: policiesReducer,
     policy: policyReducer,
     login: loginReducer,
+    currentUser: currentUserReducer,
     routing: routerReducer,
 });
 
