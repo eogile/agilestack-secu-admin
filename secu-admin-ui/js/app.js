@@ -8,33 +8,29 @@
  */
 
 // Load the ServiceWorker, the Cache polyfill, the manifest.json file and the .htaccess file
-import 'file?name=[name].[ext]!../serviceworker.js';
-import 'file?name=[name].[ext]!../manifest.json';
-import 'file?name=[name].[ext]!../.htaccess';
-
-//// Check for ServiceWorker support before trying to install it
-//if ('serviceWorker' in navigator) {
-//  navigator.serviceWorker.register('/serviceworker.js').then(() => {
-//    console.log("service worker registered");// Registration was successful
-//  }).catch((err) => {
-//    // Registration failed
-//    console.log("service worker registration failed.", err);
-//  });
-//} else {
-//  // No ServiceWorker Support
-//}
-
-// Import all the third party stuff
-import React from 'react';
-import ReactDOM from 'react-dom';
-import { Provider } from 'react-redux';
-import { Router, Route, hashhistory, IndexRoute } from 'react-router';
-import { createStore, applyMiddleware, compose } from 'redux';
-import thunk from 'redux-thunk';
-import FontFaceObserver from 'fontfaceobserver';
-//import createHistory from 'history/lib/createBrowserHistory';
-import { createHistory, useBasename } from 'history';
-import { routerMiddleware, syncHistoryWithStore } from 'react-router-redux';
+import "file?name=[name].[ext]!../serviceworker.js";
+import "file?name=[name].[ext]!../manifest.json";
+import "file?name=[name].[ext]!../.htaccess";
+import React from "react";
+import ReactDOM from "react-dom";
+import {Provider} from "react-redux";
+import {Router, Route, useRouterHistory, IndexRoute} from "react-router";
+import {createStore, applyMiddleware, compose} from "redux";
+import thunk from "redux-thunk";
+import FontFaceObserver from "fontfaceobserver";
+import {createHistory} from "history";
+import {routerMiddleware, syncHistoryWithStore} from "react-router-redux";
+import injectTapEventPlugin from "react-tap-event-plugin";
+import HomePage from "./components/pages/HomePage.react";
+import {LoginPage} from "agilestack-login-ui";
+import ProfilesPage from "./components/pages/ProfilesPage.react";
+import UsersPage from "./components/pages/UsersPage.react";
+import RolesPage from "./components/pages/RolesPage.react";
+import ReadmePage from "./components/pages/ReadmePage.react";
+import NotFoundPage from "./components/pages/NotFound.react";
+import App from "./components/App.react";
+import "../css/main.css";
+import rootReducer from "./reducers/rootReducer";
 
 // Observer loading of Open Sans (to remove open sans, remove the <link> tag in the index.html file and this observer)
 const openSansObserver = new FontFaceObserver('Open Sans', {});
@@ -47,28 +43,15 @@ openSansObserver.check().then(() => {
 });
 
 // Needed for onTouchTap
-import injectTapEventPlugin from 'react-tap-event-plugin';
 injectTapEventPlugin();
 
-// Import the pages
-import HomePage from './components/pages/HomePage.react';
-import { LoginPage } from 'agilestack-login-ui';
-import ProfilesPage from './components/pages/ProfilesPage.react';
-import UsersPage from './components/pages/UsersPage.react';
-import RolesPage from './components/pages/RolesPage.react';
-import ReadmePage from './components/pages/ReadmePage.react';
-import NotFoundPage from './components/pages/NotFound.react';
-import App from './components/App.react';
-
-// Import the CSS file, which HtmlWebpackPlugin transfers to the build folder
-import '../css/main.css';
-
-let history = useBasename(createHistory)({
-  basename: window.baseUrl
+const baseUrl = document.getElementsByTagName('base')[0].href.replace(/^https?:\/\/[^\/]+/i, "");
+let history = useRouterHistory(createHistory)({
+  basename: baseUrl
 });
+
 // Create the store with the redux-thunk middleware, which allows us
 // to do asynchronous things in the actions
-import rootReducer from './reducers/rootReducer';
 const middlewareHistory = routerMiddleware(history);
 const createStoreWithMiddleware = compose(
     applyMiddleware(thunk),

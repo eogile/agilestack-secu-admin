@@ -10,6 +10,7 @@ import React, {Component} from "react";
 import {connect} from "react-redux";
 import Logo from "../../img/AgileStack_transparent_logo.png";
 import {Avatar, FlatButton, NavigationExpandMoreIcon, Toolbar, ToolbarGroup} from "material-ui";
+import {getMuiTheme, MuiThemeProvider} from 'material-ui/styles';
 import {push} from "react-router-redux";
 import {logout} from 'agilestack-login-ui';
 
@@ -31,6 +32,9 @@ function initials(currentUser) {
   console.log('initials', currentUser, initials);
   return initials;
 }
+
+const muiTheme = getMuiTheme({
+});
 
 class App extends Component {
 
@@ -57,23 +61,25 @@ class App extends Component {
   render() {
     const {currentUser} = this.props;
     return (
-      <div className="wrapper">
-        <Toolbar>
-          <ToolbarGroup firstChild={true} float="left">
-            <img className="logo" src={Logo} />
-          </ToolbarGroup>
-          <ToolbarGroup float="right">
-            {currentUser.loggedIn ? (
-              <Avatar style={{marginTop: '10'}} onTouchTap={this.onLogout}>
-                {initials(currentUser.user)}
-              </Avatar>
-            ) : (
-              <FlatButton label="Sign in" primary={true} onTouchTap={this.onLogin}/>
-            )}
-          </ToolbarGroup>
-        </Toolbar>
-        {this.props.children}
-      </div>
+      <MuiThemeProvider muiTheme={muiTheme}>
+        <div className="wrapper">
+          <Toolbar>
+            <ToolbarGroup firstChild={true} float="left">
+              <img className="logo" src={Logo} />
+            </ToolbarGroup>
+            <ToolbarGroup float="right">
+              {currentUser.loggedIn ? (
+                <Avatar style={{marginTop: 10}} onTouchTap={this.onLogout}>
+                  {initials(currentUser.user)}
+                </Avatar>
+              ) : (
+                <FlatButton label="Sign in" primary={true} onTouchTap={this.onLogin}/>
+              )}
+            </ToolbarGroup>
+          </Toolbar>
+          {this.props.children}
+        </div>
+      </MuiThemeProvider>
     );
   }
 }

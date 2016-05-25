@@ -30,7 +30,7 @@ func main() {
 			log.Fatalf("unable to find index.html :%v", err)
 		}
 
-		newIndexContent := bytes.Replace(oldIndexContent, []byte("window.baseUrl=\"/\""), []byte("window.baseUrl=\"/"+baseUrl+"\""), -1)
+		newIndexContent := bytes.Replace(oldIndexContent, []byte("<base href=\"/\"/>"), []byte("<base href=\"/"+baseUrl+"/\"/>"), -1)
 		err = ioutil.WriteFile(indexPath, newIndexContent, 0644)
 	}
 	/**
