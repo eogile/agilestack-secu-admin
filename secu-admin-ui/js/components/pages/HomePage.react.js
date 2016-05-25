@@ -14,7 +14,7 @@ class HomePage extends Component {
     return (
       <div style={{display: 'flex', justifyContent: 'space-around'}}>
         <Link className="btn" to={{pathname:'/login', query:{callback: routing.locationBeforeTransitions.pathname}}}>Login</Link>
-        {currentUser.loggedIn && <Link className="btn" to="/profiles">Profiles</Link>}
+        <Link className="btn" to="/profiles">Profiles</Link>
         {currentUser.loggedIn && <Link className="btn" to="/users">Users</Link>}
         {currentUser.loggedIn && <Link className="btn" to="/roles">Roles</Link>}
       </div>
