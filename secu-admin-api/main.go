@@ -11,13 +11,14 @@ import (
 
 	"io/ioutil"
 
+	"errors"
+
+	"github.com/eogile/agilestack-secu-admin/secu-admin-api/models"
 	"github.com/eogile/agilestack-utils/auth"
 	"github.com/eogile/agilestack-utils/plugins"
 	"github.com/eogile/agilestack-utils/secu"
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
-	"github.com/eogile/agilestack-secu-admin/secu-admin-api/models"
-	"errors"
 )
 
 const (
@@ -268,7 +269,7 @@ func updateUserPassword(w http.ResponseWriter, r *http.Request) {
 }
 
 // Update a user first and last name
-var updateUserFirstLastName = updateUserData(func(r *http.Request, user *secu.User) (*secu.User, error){
+var updateUserFirstLastName = updateUserData(func(r *http.Request, user *secu.User) (*secu.User, error) {
 	defer r.Body.Close()
 	var userData secu.UserData
 	err := json.NewDecoder(r.Body).Decode(&userData)
@@ -277,28 +278,28 @@ var updateUserFirstLastName = updateUserData(func(r *http.Request, user *secu.Us
 		return nil, fmt.Errorf("Invalid request: %s", err.Error())
 	}
 	if userData.FirstName == "" || userData.LastName == "" {
-		return  nil, errors.New("Please provide a first and last name")
+		return nil, errors.New("Please provide a first and last name")
 	}
 
 	user.UserData.FirstName = userData.FirstName
 	user.UserData.LastName = userData.LastName
 	return user, nil
-});
+})
 
-var updateUserActiveStatus = updateUserData(func(r *http.Request, user *secu.User) (*secu.User, error){
+var updateUserActiveStatus = updateUserData(func(r *http.Request, user *secu.User) (*secu.User, error) {
 	defer r.Body.Close()
 	var request models.ActiveStatusUpdateRequest
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
 		return nil, fmt.Errorf("Invalid request: %s", err.Error())
 	}
-	user.SetActive(request.Status)
+	user.SetInactive(!request.Status)
 	return user, nil
-});
+})
 
-func updateUserData(updateFunction func(r *http.Request, user *secu.User) (*secu.User, error)) func (http.ResponseWriter, *http.Request) {
+func updateUserData(updateFunction func(r *http.Request, user *secu.User) (*secu.User, error)) func(http.ResponseWriter, *http.Request) {
 
-	return func (w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 		id, exists := mux.Vars(r)["id"]
 		if !exists {
 			http.Error(w, "No id given", http.StatusBadRequest)
@@ -308,10 +309,10 @@ func updateUserData(updateFunction func(r *http.Request, user *secu.User) (*secu
 		tokenInfo := r.Header.Get("tokenInfo")
 		user, err := hydraClient.FindUser(id, &auth.TokenInfo{TokenInfo: tokenInfo})
 		if err != nil {
-			http.Error(w, "Error while finding the user:" + err.Error(), http.StatusInternalServerError)
+			http.Error(w, "Error while finding the user:"+err.Error(), http.StatusInternalServerError)
 		}
 		if user == nil {
-			http.Error(w, "No user for ID " + id, http.StatusNotFound)
+			http.Error(w, "No user for ID "+id, http.StatusNotFound)
 			return
 		}
 
@@ -324,7 +325,7 @@ func updateUserData(updateFunction func(r *http.Request, user *secu.User) (*secu
 		// Updating the user
 		err = hydraClient.UpdateUserData(id, newUser.UserData, &auth.TokenInfo{TokenInfo: tokenInfo})
 		if err != nil {
-			http.Error(w, "Error updating the user " + err.Error(), http.StatusInternalServerError)
+			http.Error(w, "Error updating the user "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 
