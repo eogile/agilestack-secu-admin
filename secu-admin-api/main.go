@@ -293,7 +293,7 @@ var updateUserActiveStatus = updateUserData(func(r *http.Request, user *secu.Use
 	if err != nil {
 		return nil, fmt.Errorf("Invalid request: %s", err.Error())
 	}
-	user.SetInactive(!request.Status)
+	user.SetInactive(!request.ActiveStatus)
 	return user, nil
 })
 
