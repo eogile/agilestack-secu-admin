@@ -801,6 +801,7 @@ func main() {
 	}
 
 	hydraClient = auth.NewClient(authorizationServer, clientID, clientSecret)
+	createDefaultPolicyIfNeeded()
 
 	pluginsInfoClient = plugins.NewPluginInfoStorageClient()
 
@@ -822,5 +823,21 @@ func main() {
 
 	//Run listening server
 	startHttp()
+}
 
+func createDefaultPolicyIfNeeded() {
+	token, err := hydraClient.Login(os.Getenv("SUPERACCOUNT_USERNAME"), os.Getenv("SUPERACCOUNT_SECRET"))
+	if err != nil {
+		log.Fatalln("Erro while connecting to Hydra", err)
+	}
+
+	tokenInfo, err := auth.EncodeTokenInfo(token)
+	if err != nil {
+		log.Fatalln("Error while encoding token info", err)
+	}
+
+	_, err = hydraClient.CreateDefaultPolicy(tokenInfo)
+	if err != nil {
+		log.Fatalln("Error while creating the default policy", err)
+	}
 }
