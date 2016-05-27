@@ -842,4 +842,42 @@ func createDefaultPolicyIfNeeded() {
 	if err != nil {
 		log.Fatalln("Error while creating the default policy", err)
 	}
+
+	user1 := secu.User{
+		Login:"user1@eogile.com",
+		Password:"user1",
+		UserData: secu.UserData{
+			FirstName:"User1 first name",
+			LastName:"User1 first name",
+		},
+	}
+	hydraClient.CreateUser(&user1, tokenInfo)
+
+	userData2 := &secu.UserData{
+		FirstName:"User2 first name",
+		LastName:"User2 first name",
+	}
+	user2 := secu.User{
+		Login:"user2@eogile.com",
+		Password:"user2",
+		UserData: *userData2,
+	}
+	id2, _ := hydraClient.CreateUser(&user2, tokenInfo)
+
+	userData3 := &secu.UserData{
+		FirstName:"User3 first name",
+		LastName:"User3 first name",
+	}
+	user3 := secu.User{
+		Login:"user3@eogile.com",
+		Password:"user3",
+		UserData: *userData3,
+	}
+	id3, _ := hydraClient.CreateUser(&user3, tokenInfo)
+
+	userData2.Blocked = true
+	hydraClient.UpdateUserData(id2, *userData2, tokenInfo)
+
+	userData3.Inactive = true
+	hydraClient.UpdateUserData(id3, *userData3, tokenInfo)
 }
