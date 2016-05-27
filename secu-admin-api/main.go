@@ -11,6 +11,9 @@ import (
 
 	"io/ioutil"
 
+	"errors"
+
+	"github.com/eogile/agilestack-secu-admin/secu-admin-api/models"
 	"github.com/eogile/agilestack-utils/auth"
 	"github.com/eogile/agilestack-utils/plugins"
 	"github.com/eogile/agilestack-utils/plugins/resource"
@@ -89,6 +92,7 @@ func startHttp() {
 	toBeSecuredRouter.HandleFunc("/users/{id}/login", updateUserLogin).Methods("PUT")
 	toBeSecuredRouter.HandleFunc("/users/{id}/password", updateUserPassword).Methods("PUT")
 	toBeSecuredRouter.HandleFunc("/users/{id}/name", updateUserFirstLastName).Methods("PUT")
+	toBeSecuredRouter.HandleFunc("/users/{id}/active", updateUserActiveStatus).Methods("PUT")
 	toBeSecuredRouter.HandleFunc("/roles", listRoles).Methods("GET")
 	toBeSecuredRouter.HandleFunc("/roles", createRole).Methods("POST")
 	toBeSecuredRouter.HandleFunc("/roles/{id}", getRole).Methods("GET")
@@ -266,32 +270,68 @@ func updateUserPassword(w http.ResponseWriter, r *http.Request) {
 }
 
 // Update a user first and last name
-func updateUserFirstLastName(w http.ResponseWriter, r *http.Request) {
-	id, exists := mux.Vars(r)["id"]
-	if !exists {
-		http.Error(w, "No id given", http.StatusBadRequest)
-		return
-	}
-
+var updateUserFirstLastName = updateUserData(func(r *http.Request, user *secu.User) (*secu.User, error) {
 	defer r.Body.Close()
-	var userdata secu.UserData
-	err := json.NewDecoder(r.Body).Decode(&userdata)
+	var userData secu.UserData
+	err := json.NewDecoder(r.Body).Decode(&userData)
+
 	if err != nil {
-		http.Error(w, "Invalid request: "+err.Error(), http.StatusBadRequest)
-		return
+		return nil, fmt.Errorf("Invalid request: %s", err.Error())
 	}
-	if userdata.FirstName == "" || userdata.LastName == "" {
-		http.Error(w, "Please provide a first and last name", http.StatusBadRequest)
-		return
+	if userData.FirstName == "" || userData.LastName == "" {
+		return nil, errors.New("Please provide a first and last name")
 	}
 
-	tokenInfo := r.Header.Get("tokenInfo")
-	err = hydraClient.UpdateUserData(id, userdata, &auth.TokenInfo{TokenInfo: tokenInfo})
+	user.UserData.FirstName = userData.FirstName
+	user.UserData.LastName = userData.LastName
+	return user, nil
+})
+
+var updateUserActiveStatus = updateUserData(func(r *http.Request, user *secu.User) (*secu.User, error) {
+	defer r.Body.Close()
+	var request models.ActiveStatusUpdateRequest
+	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
-		http.Error(w, "Error updating the user "+err.Error(), http.StatusInternalServerError)
-		return
+		return nil, fmt.Errorf("Invalid request: %s", err.Error())
 	}
-	w.WriteHeader(http.StatusNoContent)
+	user.SetInactive(!request.ActiveStatus)
+	return user, nil
+})
+
+func updateUserData(updateFunction func(r *http.Request, user *secu.User) (*secu.User, error)) func(http.ResponseWriter, *http.Request) {
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		id, exists := mux.Vars(r)["id"]
+		if !exists {
+			http.Error(w, "No id given", http.StatusBadRequest)
+			return
+		}
+
+		tokenInfo := r.Header.Get("tokenInfo")
+		user, err := hydraClient.FindUser(id, &auth.TokenInfo{TokenInfo: tokenInfo})
+		if err != nil {
+			http.Error(w, "Error while finding the user:"+err.Error(), http.StatusInternalServerError)
+		}
+		if user == nil {
+			http.Error(w, "No user for ID "+id, http.StatusNotFound)
+			return
+		}
+
+		newUser, err := updateFunction(r, user)
+		if err != nil {
+			http.Error(w, "Invalid request: "+err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		// Updating the user
+		err = hydraClient.UpdateUserData(id, newUser.UserData, &auth.TokenInfo{TokenInfo: tokenInfo})
+		if err != nil {
+			http.Error(w, "Error updating the user "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusNoContent)
+	}
 }
 
 // listProfiles List profiles
@@ -763,6 +803,7 @@ func main() {
 	}
 
 	hydraClient = auth.NewClient(authorizationServer, clientID, clientSecret)
+	createDefaultPolicyIfNeeded()
 
 	pluginsInfoClient = resource.NewPluginResourcesStorageClient()
 
@@ -784,5 +825,21 @@ func main() {
 
 	//Run listening server
 	startHttp()
+}
 
+func createDefaultPolicyIfNeeded() {
+	token, err := hydraClient.Login(os.Getenv("SUPERACCOUNT_USERNAME"), os.Getenv("SUPERACCOUNT_SECRET"))
+	if err != nil {
+		log.Fatalln("Erro while connecting to Hydra", err)
+	}
+
+	tokenInfo, err := auth.EncodeTokenInfo(token)
+	if err != nil {
+		log.Fatalln("Error while encoding token info", err)
+	}
+
+	_, err = hydraClient.CreateDefaultPolicy(tokenInfo)
+	if err != nil {
+		log.Fatalln("Error while creating the default policy", err)
+	}
 }
