@@ -13,6 +13,7 @@ import (
 
 	"github.com/eogile/agilestack-utils/auth"
 	"github.com/eogile/agilestack-utils/plugins"
+	"github.com/eogile/agilestack-utils/plugins/resource"
 	"github.com/eogile/agilestack-utils/secu"
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
@@ -35,13 +36,13 @@ var (
 	clientID            string
 	clientSecret        string
 	authorizationServer string
-	pluginsInfoClient   plugins.PluginInfoStorageClient
-	accountsResource    = plugins.Resource{
+	pluginsInfoClient   resource.PluginResourcesStorageClient
+	accountsResource    = resource.Resource{
 		Key:         "accounts",
 		SecurityKey: "rn:hydra:accounts",
 		Permissions: []string{"create", "get", "delete", "put:password", "put:data"},
 	}
-	policiesResource = plugins.Resource{
+	policiesResource = resource.Resource{
 		Key:         "policies",
 		SecurityKey: "rn:hydra:policies",
 		Permissions: []string{"create", "update", "get", "delete"},
@@ -763,7 +764,7 @@ func main() {
 
 	hydraClient = auth.NewClient(authorizationServer, clientID, clientSecret)
 
-	pluginsInfoClient = plugins.NewPluginInfoStorageClient()
+	pluginsInfoClient = resource.NewPluginResourcesStorageClient()
 
 	err := pluginsInfoClient.StoreResource(accountsResource)
 	if err != nil {
